@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from app.core.database import Base, engine
+from app.models.user import User
 
 app = FastAPI(
     title="Authentication System API",

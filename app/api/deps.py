@@ -6,6 +6,8 @@ from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models.user import User
 
+from typing import Callable
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def get_current_user(
@@ -35,3 +37,13 @@ def get_current_user(
         raise credentials_exception
     
     return user
+
+def require_role(required_role: str) -> Callable:
+    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. {required_role} role required."
+            )
+        return current_user
+    return role_checker
